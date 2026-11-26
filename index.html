@@ -1,0 +1,529 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark" />
+  <title>YouTube Outlier Intelligence — Live 600-Video Interactive Demo (100x Cheaper Than $99/mo SaaS)</title>
+  <meta name="description" content="Explore 600 real Pop-Science YouTube videos, 98 statistical outliers, headline n-gram lift, and 45-second opening hooks. Pay-per-use $0.05/250 videos on Apify + MCP." />
+  <style>
+    :root {
+      --bg: #0b0e14;
+      --surface: #131823;
+      --surface-2: #1b2230;
+      --border: #273145;
+      --text: #e6ecf5;
+      --muted: #93a1b8;
+      --accent: #38bdf8;
+      --accent-2: #818cf8;
+      --good: #34d399;
+      --warn: #fbbf24;
+      --bad: #f87171;
+      --radius: 12px;
+      --font: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .wrap { max-width: 1200px; margin: 0 auto; padding: 24px 20px 64px; }
+    header.hero {
+      background: linear-gradient(135deg, rgba(56,189,248,0.12), rgba(129,140,248,0.10));
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      margin-bottom: 24px;
+    }
+    .badge-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+    .pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 12px; font-weight: 600; padding: 4px 10px;
+      border-radius: 999px; background: var(--surface-2); border: 1px solid var(--border); color: var(--accent);
+    }
+    .pill.good { color: var(--good); }
+    h1 { margin: 0 0 10px; font-size: clamp(24px, 3.2vw, 34px); letter-spacing: -0.02em; }
+    .sub { color: var(--muted); max-width: 780px; margin: 0 0 18px; font-size: 15px; }
+    .cta-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 10px 18px; border-radius: 10px; font-weight: 600; font-size: 14px;
+      border: 1px solid var(--border); background: var(--surface-2); color: var(--text);
+      cursor: pointer; transition: transform .12s ease, border-color .15s ease;
+    }
+    .btn:hover { border-color: var(--accent); text-decoration: none; transform: translateY(-1px); }
+    .btn.primary {
+      background: linear-gradient(135deg, #0284c7, #4f46e5);
+      border-color: transparent; color: #fff;
+    }
+    .kpi-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 14px; margin-bottom: 24px;
+    }
+    .kpi {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 16px;
+    }
+    .kpi-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+    .kpi-val { font-size: 26px; font-weight: 700; margin-top: 4px; }
+    .kpi-sub { font-size: 12px; color: var(--good); margin-top: 2px; }
+
+    .channels-bar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+    .ch-btn {
+      padding: 8px 14px; border-radius: 999px; border: 1px solid var(--border);
+      background: var(--surface); color: var(--muted); cursor: pointer; font-size: 13px; font-weight: 600;
+    }
+    .ch-btn.active { background: var(--accent); color: #06101c; border-color: var(--accent); }
+
+    .controls {
+      display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+      margin-bottom: 16px; background: var(--surface); border: 1px solid var(--border);
+      padding: 12px; border-radius: var(--radius);
+    }
+    .controls input, .controls select {
+      background: var(--bg); color: var(--text); border: 1px solid var(--border);
+      border-radius: 8px; padding: 8px 12px; font-size: 14px;
+    }
+    .controls input { flex: 1; min-width: 200px; }
+    .controls label { font-size: 13px; color: var(--muted); display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+    @media (max-width: 860px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 18px; margin-bottom: 20px;
+    }
+    .card h2 { margin: 0 0 12px; font-size: 17px; display: flex; align-items: center; justify-content: space-between; }
+    .bar-row { margin-bottom: 10px; }
+    .bar-meta { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px; }
+    .bar-track { height: 8px; background: var(--bg); border-radius: 999px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--accent), var(--accent-2)); }
+    .bar-fill.good { background: var(--good); }
+    .bar-fill.warn { background: var(--warn); }
+    .bar-fill.bad { background: var(--bad); }
+
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+    tr:hover td { background: rgba(56,189,248,0.04); }
+    .mult { font-family: var(--mono); font-weight: 700; color: var(--good); }
+    .zscore { font-family: var(--mono); color: var(--accent); }
+    .tag {
+      display: inline-block; font-size: 11px; padding: 2px 7px; border-radius: 6px;
+      background: var(--surface-2); border: 1px solid var(--border); color: var(--muted); margin-right: 4px; margin-top: 4px;
+    }
+    .tag.hook { color: var(--good); border-color: rgba(52,211,153,0.35); cursor: pointer; }
+    .tag.hook:hover { background: rgba(52,211,153,0.12); }
+
+    dialog {
+      background: var(--surface); color: var(--text); border: 1px solid var(--border);
+      border-radius: 14px; max-width: 720px; width: calc(100% - 32px); padding: 22px;
+    }
+    dialog::backdrop { background: rgba(0, 0, 0, 0.72); }
+    .hook-box {
+      background: var(--bg); border: 1px solid var(--border); border-radius: 10px;
+      padding: 14px; font-size: 14px; line-height: 1.65; white-space: pre-wrap; margin: 12px 0;
+    }
+    pre.code {
+      background: var(--bg); border: 1px solid var(--border); border-radius: 10px;
+      padding: 14px; font-family: var(--mono); font-size: 12px; overflow-x: auto; color: #cbd5e1;
+    }
+    .price-win { color: var(--good); font-weight: 700; }
+    .muted { color: var(--muted); font-size: 13px; }
+    footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 32px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <div class="badge-row">
+        <span class="pill good">LIVE 600-VIDEO DATASET</span>
+        <span class="pill">$0/MONTH SUBSCRIPTION</span>
+        <span class="pill">APIFY PPE + MCP READY</span>
+        <span class="pill">AUTO COMPETITOR DISCOVERY (UP TO 10,000 VIDEOS)</span>
+      </div>
+      <h1>YouTube Outlier, Title Lift &amp; Opening-Hook Intelligence</h1>
+      <p class="sub">
+        Click through <strong>600 real Pop-Science videos</strong> from <code>@veritasium</code>, <code>@Vsauce</code>, <code>@3blue1brown</code>, <code>@kurzgesagt</code>, <code>@MarkRober</code>, and <code>@smartereveryday</code>.
+        Deterministic MAD Modified Z-Score, headline n-gram lift, and exact 45-second spoken hooks — <strong>100&times;&ndash;300&times; cheaper</strong> than $49&ndash;$99/mo SaaS tools.
+      </p>
+      <div class="cta-row">
+        <a class="btn primary" href="https://apify.com/oleksimakee/youtube-outlier-intelligence" target="_blank" rel="noopener noreferrer">
+          Analyze Your Own Channels ($0.05 / 250 vids) &rarr;
+        </a>
+        <a class="btn" href="#pricing">Compare vs Viewstats / 1of10 / OutlierKit</a>
+        <a class="btn" href="#mcp">Connect via MCP (Claude / n8n)</a>
+      </div>
+    </header>
+
+    <section class="kpi-grid" id="kpi-grid">
+      <div class="kpi"><div class="kpi-label">Videos Analyzed</div><div class="kpi-val" id="kpi-videos">—</div><div class="kpi-sub">6 Pop-Science channels</div></div>
+      <div class="kpi"><div class="kpi-label">Statistical Outliers</div><div class="kpi-val" id="kpi-outliers">—</div><div class="kpi-sub">&ge; 2.0&times; rolling median</div></div>
+      <div class="kpi"><div class="kpi-label">45s Opening Hooks</div><div class="kpi-val" id="kpi-hooks">—</div><div class="kpi-sub">Token-budgeted for MCP</div></div>
+      <div class="kpi"><div class="kpi-label">Cost vs $99/mo SaaS</div><div class="kpi-val">$0.29</div><div class="kpi-sub">2 channels + 10 hooks (0 sub)</div></div>
+    </section>
+
+    <nav class="channels-bar" id="channels-bar" aria-label="Channel filter"></nav>
+
+    <div class="controls">
+      <input type="search" id="search-input" placeholder="Filter outliers by title, channel, or hook phrase..." aria-label="Filter outliers" />
+      <select id="sort-select" aria-label="Sort outliers">
+        <option value="mult">Sort: Multiplier (&times; median)</option>
+        <option value="z">Sort: MAD Z-Score</option>
+        <option value="views">Sort: Total Views</option>
+        <option value="vph">Sort: Velocity (Views/hr)</option>
+      </select>
+      <label><input type="checkbox" id="hooks-only" /> Only with 45s Hook Transcript</label>
+    </div>
+
+    <div class="grid-2">
+      <section class="card">
+        <h2>Headline N-Gram Lift <span class="muted" id="ngram-scope">Cross-Channel Niche</span></h2>
+        <div id="ngram-bars"></div>
+      </section>
+      <section class="card">
+        <h2>Title Structure Lift <span class="muted" id="struct-scope">Median Views vs Baseline</span></h2>
+        <div id="struct-bars"></div>
+      </section>
+    </div>
+
+    <section class="card">
+      <h2>Breakout Outliers Explorer <span class="muted" id="result-count">Loading...</span></h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Channel</th>
+              <th>Video Title &amp; Signals</th>
+              <th>Views</th>
+              <th>&times; Median</th>
+              <th>MAD Z</th>
+              <th>45s Hook</th>
+            </tr>
+          </thead>
+          <tbody id="outliers-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card" id="pricing">
+      <h2>Price Comparison: Pay-Per-Use vs Monthly SaaS Subscriptions</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Tool</th>
+              <th>Monthly Subscription</th>
+              <th>API / MCP Access</th>
+              <th>Auto Competitor Discovery</th>
+              <th>Cost for 2 Channels + 10 Hooks</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>YouTube Outlier Intelligence (Apify)</strong></td>
+              <td class="price-win">$0 / month</td>
+              <td class="price-win">Built-in (REST + mcp.apify.com)</td>
+              <td class="price-win">Yes (up to 10,000 vids/run)</td>
+              <td class="price-win">$0.29 (Zero-Charge-on-Empty SLA)</td>
+            </tr>
+            <tr><td>OutlierKit</td><td>$49 &ndash; $399 / mo</td><td>Pro ($99/mo+)</td><td>Yes</td><td>$49 &ndash; $99 / mo</td></tr>
+            <tr><td>Viewstats</td><td>$49.99 &ndash; $249 / mo</td><td>Business ($249/mo)</td><td>Yes</td><td>$49.99 / mo</td></tr>
+            <tr><td>1of10</td><td>$19 &ndash; $89 / mo</td><td>Limited</td><td>Yes</td><td>$19 &ndash; $89 / mo</td></tr>
+            <tr><td>NexLev</td><td>$13 &ndash; $42 / mo</td><td>MCP Free/Pro</td><td>Niche Finder</td><td>$42 / mo</td></tr>
+            <tr><td>vidIQ</td><td>$49 &ndash; $99+ / mo</td><td>No open MCP</td><td>Partial</td><td>$49 / mo</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card" id="mcp">
+      <h2>Connect Directly to Claude Desktop, Cursor, or n8n (MCP)</h2>
+      <p class="muted">Zero LLM COGS inside the Actor — it returns compact statistical JSON + token-budgeted opening hooks so your AI agent never overflows context.</p>
+      <pre class="code" id="mcp-code">{
+  "mcpServers": {
+    "youtube-outlier-intelligence": {
+      "url": "https://mcp.apify.com/?actors=oleksimakee/youtube-outlier-intelligence",
+      "headers": {
+        "Authorization": "Bearer &lt;YOUR_APIFY_API_TOKEN&gt;"
+      }
+    }
+  }
+}</pre>
+      <button class="btn" id="copy-mcp" type="button">Copy MCP Config</button>
+    </section>
+
+    <footer>
+      Public Interactive Demo Snapshot &bull; Powered by YouTube Outlier Intelligence (Apify PPE + MCP) &bull; Zero Login Required
+    </footer>
+  </div>
+
+  <dialog id="hook-dialog">
+    <h2 id="dlg-title" style="margin:0 0 6px;font-size:18px;"></h2>
+    <div id="dlg-meta" class="muted"></div>
+    <div id="dlg-hook" class="hook-box"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+      <a id="dlg-link" class="btn primary" href="#" target="_blank" rel="noopener noreferrer">Watch on YouTube &rarr;</a>
+      <button id="dlg-close" class="btn" type="button">Close</button>
+    </div>
+  </dialog>
+
+  <script>
+    const fmtNum = (n) => {
+      if (n == null || !Number.isFinite(n)) return "—";
+      if (n >= 1e6) return (n / 1e6).toFixed(1) + "M";
+      if (n >= 1e3) return (n / 1e3).toFixed(1) + "K";
+      return String(Math.round(n));
+    };
+
+    const safeHttps = (u) => (typeof u === "string" && u.startsWith("https://")) ? u : "#";
+
+    const state = {
+      audits: [],
+      report: null,
+      selected: "ALL",
+      search: "",
+      sort: "mult",
+      hooksOnly: false,
+    };
+
+    function renderBars(container, rows, labelFn, valueFn, maxVal, colorFn) {
+      container.textContent = "";
+      if (!rows || !rows.length) {
+        const p = document.createElement("p");
+        p.className = "muted";
+        p.textContent = "No significant lift items for this filter.";
+        container.appendChild(p);
+        return;
+      }
+      rows.slice(0, 8).forEach((row) => {
+        const wrap = document.createElement("div");
+        wrap.className = "bar-row";
+        const meta = document.createElement("div");
+        meta.className = "bar-meta";
+        const left = document.createElement("span");
+        left.textContent = labelFn(row);
+        const right = document.createElement("strong");
+        right.textContent = valueFn(row);
+        meta.append(left, right);
+
+        const track = document.createElement("div");
+        track.className = "bar-track";
+        const fill = document.createElement("div");
+        const val = Number(row.lift_multiplier || 0);
+        fill.className = "bar-fill " + (colorFn ? colorFn(val) : "");
+        fill.style.width = Math.max(4, Math.min(100, (val / maxVal) * 100)) + "%";
+        track.appendChild(fill);
+
+        wrap.append(meta, track);
+        container.appendChild(wrap);
+      });
+    }
+
+    function openHookModal(o) {
+      const dlg = document.getElementById("hook-dialog");
+      document.getElementById("dlg-title").textContent = o.title || "Untitled";
+      document.getElementById("dlg-meta").textContent =
+        `${o.channel_handle} • ${fmtNum(o.views)} views • ${(o.median_multiplier || 0).toFixed(2)}x median • Z=${(o.mad_modified_z_score || 0).toFixed(2)}`;
+      const tr = o.transcript || {};
+      document.getElementById("dlg-hook").textContent =
+        tr.hook_text || "No transcript extracted for this video.";
+      document.getElementById("dlg-link").href = safeHttps(o.url);
+      dlg.showModal();
+    }
+
+    function render() {
+      const activeAudit = state.selected === "ALL"
+        ? null
+        : state.audits.find((a) => a.channel_handle === state.selected);
+
+      // Update channel pills
+      document.querySelectorAll(".ch-btn").forEach((b) => {
+        b.classList.toggle("active", b.dataset.ch === state.selected);
+      });
+
+      // Collect outliers
+      let outliers = activeAudit
+        ? (activeAudit.outliers || [])
+        : state.audits.flatMap((a) => a.outliers || []);
+
+      const q = state.search.trim().toLowerCase();
+      if (q) {
+        outliers = outliers.filter((o) => {
+          const hay = `${o.title || ""} ${o.channel_handle || ""} ${(o.transcript && o.transcript.hook_text) || ""}`.toLowerCase();
+          return hay.includes(q);
+        });
+      }
+      if (state.hooksOnly) {
+        outliers = outliers.filter((o) => o.transcript && o.transcript.hook_text);
+      }
+
+      const sorters = {
+        mult: (a, b) => (b.median_multiplier || 0) - (a.median_multiplier || 0),
+        z: (a, b) => (b.mad_modified_z_score || 0) - (a.mad_modified_z_score || 0),
+        views: (a, b) => (b.views || 0) - (a.views || 0),
+        vph: (a, b) => (b.views_per_hour || 0) - (a.views_per_hour || 0),
+      };
+      outliers = [...outliers].sort(sorters[state.sort] || sorters.mult);
+
+      document.getElementById("result-count").textContent = `${outliers.length} outliers shown`;
+
+      // Render N-gram & Title Structure charts
+      const ngrams = activeAudit ? (activeAudit.ngram_lift || []) : ((state.report && state.report.niche_ngram_lift) || []);
+      const structs = activeAudit ? (activeAudit.title_structure_lift || []) : ((state.report && state.report.niche_title_structure_lift) || []);
+      document.getElementById("ngram-scope").textContent = activeAudit ? activeAudit.channel_handle : "Cross-Channel Niche";
+      document.getElementById("struct-scope").textContent = activeAudit ? activeAudit.channel_handle : "600-Video Baseline";
+
+      const maxNg = Math.max(2, ...ngrams.slice(0, 8).map((x) => Number(x.lift_multiplier || 0)));
+      renderBars(
+        document.getElementById("ngram-bars"),
+        ngrams,
+        (r) => `"${r.ngram}" (${r.count} vids)`,
+        (r) => `${Number(r.lift_multiplier || 0).toFixed(2)}x`,
+        maxNg,
+        (v) => (v >= 2.0 ? "good" : "")
+      );
+
+      const featureLabels = {
+        has_negative_frame: "Negative / Tension Frame",
+        has_question: "Question Title (?)",
+        has_brackets: "Brackets / Parentheses",
+        has_number: "Contains Number",
+      };
+      renderBars(
+        document.getElementById("struct-bars"),
+        structs,
+        (r) => `${featureLabels[r.feature] || r.feature} (${r.with_count} vids)`,
+        (r) => `${Number(r.lift_multiplier || 0).toFixed(2)}x`,
+        2.0,
+        (v) => (v >= 1.1 ? "good" : v >= 0.8 ? "warn" : "bad")
+      );
+
+      // Render Outliers table safely via textContent
+      const tbody = document.getElementById("outliers-body");
+      tbody.textContent = "";
+      outliers.slice(0, 50).forEach((o) => {
+        const tr = document.createElement("tr");
+
+        const tdCh = document.createElement("td");
+        tdCh.textContent = o.channel_handle || "";
+
+        const tdTitle = document.createElement("td");
+        const link = document.createElement("a");
+        link.href = safeHttps(o.url);
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.textContent = o.title || "Untitled";
+        tdTitle.appendChild(link);
+
+        const tf = o.title_features || {};
+        const badges = document.createElement("div");
+        Object.entries(tf).forEach(([k, val]) => {
+          if (val) {
+            const sp = document.createElement("span");
+            sp.className = "tag";
+            sp.textContent = k.replace("has_", "").replace("_", " ");
+            badges.appendChild(sp);
+          }
+        });
+        if (o.published_text) {
+          const sp = document.createElement("span");
+          sp.className = "tag";
+          sp.textContent = o.published_text;
+          badges.appendChild(sp);
+        }
+        tdTitle.appendChild(badges);
+
+        const tdViews = document.createElement("td");
+        tdViews.textContent = fmtNum(o.views);
+
+        const tdMult = document.createElement("td");
+        tdMult.className = "mult";
+        tdMult.textContent = `${Number(o.median_multiplier || 0).toFixed(2)}x`;
+
+        const tdZ = document.createElement("td");
+        tdZ.className = "zscore";
+        tdZ.textContent = Number(o.mad_modified_z_score || 0).toFixed(2);
+
+        const tdHook = document.createElement("td");
+        if (o.transcript && o.transcript.hook_text) {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "tag hook";
+          btn.textContent = "Read 45s Hook";
+          btn.addEventListener("click", () => openHookModal(o));
+          tdHook.appendChild(btn);
+        } else {
+          const sp = document.createElement("span");
+          sp.className = "muted";
+          sp.textContent = "—";
+          tdHook.appendChild(sp);
+        }
+
+        tr.append(tdCh, tdTitle, tdViews, tdMult, tdZ, tdHook);
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function init() {
+      const resp = await fetch("./data/demo_data.json");
+      const data = await resp.json();
+      const ds = data.dataset || [];
+      state.audits = ds.filter((x) => x.record_type === "channel_audit");
+      state.report = ds.find((x) => x.record_type === "cross_channel_report") || null;
+
+      const sum = data.summary || {};
+      const totalVids = state.audits.reduce((acc, a) => acc + (a.videos_analyzed || 0), 0);
+      const totalOut = state.audits.reduce((acc, a) => acc + (a.outlier_count || 0), 0);
+      document.getElementById("kpi-videos").textContent = String(totalVids);
+      document.getElementById("kpi-outliers").textContent = String(totalOut);
+      document.getElementById("kpi-hooks").textContent = String(sum.transcripts_extracted || 0);
+
+      const bar = document.getElementById("channels-bar");
+      const allBtn = document.createElement("button");
+      allBtn.type = "button";
+      allBtn.className = "ch-btn active";
+      allBtn.dataset.ch = "ALL";
+      allBtn.textContent = `All 6 Channels (${totalVids} vids)`;
+      allBtn.addEventListener("click", () => { state.selected = "ALL"; render(); });
+      bar.appendChild(allBtn);
+
+      state.audits.forEach((a) => {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "ch-btn";
+        b.dataset.ch = a.channel_handle;
+        b.textContent = `${a.channel_handle} (${a.outlier_count} outliers)`;
+        b.addEventListener("click", () => { state.selected = a.channel_handle; render(); });
+        bar.appendChild(b);
+      });
+
+      document.getElementById("search-input").addEventListener("input", (e) => { state.search = e.target.value; render(); });
+      document.getElementById("sort-select").addEventListener("change", (e) => { state.sort = e.target.value; render(); });
+      document.getElementById("hooks-only").addEventListener("change", (e) => { state.hooksOnly = e.target.checked; render(); });
+      document.getElementById("dlg-close").addEventListener("click", () => document.getElementById("hook-dialog").close());
+      document.getElementById("copy-mcp").addEventListener("click", async () => {
+        const txt = document.getElementById("mcp-code").textContent;
+        await navigator.clipboard.writeText(txt);
+        const btn = document.getElementById("copy-mcp");
+        btn.textContent = "Copied!";
+        setTimeout(() => { btn.textContent = "Copy MCP Config"; }, 1500);
+      });
+
+      render();
+    }
+
+    init().catch((err) => {
+      document.getElementById("result-count").textContent = "Error loading demo_data.json: " + err.message;
+    });
+  </script>
+</body>
+</html>
